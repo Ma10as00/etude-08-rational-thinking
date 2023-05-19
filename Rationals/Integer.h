@@ -12,6 +12,9 @@ namespace cosc326 {
 
 	public:
 
+		int value;
+		bool positive;
+
 		Integer();                             // Integer i;
 		Integer(const Integer& i);             // Integer j(i);
 		Integer(const std::string& s);         // Integer k("123");
