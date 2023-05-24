@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 namespace cosc326 {
 
@@ -12,8 +13,15 @@ namespace cosc326 {
 
 	public:
 
-		int value;
-		bool positive;
+
+		typedef struct{
+			unsigned int nDigits;		//Number of digits - the size of the array (digits)
+			bool positive;				//true for positive numbers, false for negative
+			std::vector<int> digits;	//An array containing all the digits, in reverse order
+		} BigInt;
+
+		BigInt prop;
+		const BigInt BIGINT_ZERO = {1,true,{0}};
 
 		Integer();                             // Integer i;
 		Integer(const Integer& i);             // Integer j(i);

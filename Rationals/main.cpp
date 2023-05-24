@@ -15,5 +15,8 @@ int main() {
 
 	std::cout << "Kia ora World" << std::endl;
 
+	printf("hei\n");
+	// cosc326::Integer strTest = cosc326::Integer("123");
+	// std::cout << strTest.prop.digits << std::endl;
 	return 0;
 }
