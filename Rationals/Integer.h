@@ -21,6 +21,7 @@ namespace cosc326 {
 		} BigInt;
 
 		BigInt prop;
+		/** The BigInt representation of 0. */
 		const BigInt BIGINT_ZERO = {1,true,{0}};
 
 		Integer();                             // Integer i;
@@ -42,6 +43,10 @@ namespace cosc326 {
 		Integer& operator/=(const Integer& i); // j /= i;
 		Integer& operator%=(const Integer& i); // j %= i;
 
+		std::string toString();
+		
+		Integer traditionalMult(const Integer& lhs, const Integer& rhs);
+		
 		// lhs < rhs -- a 'friend' means operator isn't a member, but can access the private parts of the class.
 		// You may need to make some other functions friends, but do so sparingly.
 		friend bool operator<(const Integer& lhs, const Integer& rhs);
