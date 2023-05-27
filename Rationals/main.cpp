@@ -16,16 +16,17 @@ int main() {
 
 	std::cout << "Kia ora World" << std::endl;
 
-	//The two numbers that we test the operations on
-	std::string lStr = "200";
-	std::string rStr = "3204";
+	//Change these to test operators on differen numbers
+	std::string left = "200";
+	std::string right = "3204";
+	//--------------------------------------------------
 
 	std::cout << "Constructing default Integer: " << std::endl;
 	cosc326::Integer test = cosc326::Integer();
 	std::cout << test.toString() << std::endl;
 
 	std::cout << "Constructing Integer from string: " << std::endl;
-	test = cosc326::Integer(lStr);
+	test = cosc326::Integer(left);
 	std::cout << test.toString() << std::endl;
 		
 	std::cout << "Copying integer: " << std::endl;
@@ -33,7 +34,7 @@ int main() {
 	std::cout << test.toString() << std::endl;
 
 	std::cout << "j = ";
-	cosc326::Integer i = cosc326::Integer(lStr);
+	cosc326::Integer i = cosc326::Integer(left);
 	test = i;
 	std::cout << test.toString() << std::endl;
 	
@@ -44,36 +45,36 @@ int main() {
 	std::cout << (-test).toString() << std::endl;
 
 	std::cout << std::endl;
-	std::cout << "LHS = " + lStr + ", RHS = " + rStr << std::endl;
-	cosc326::Integer lhs = cosc326::Integer(lStr);
-	cosc326::Integer rhs = cosc326::Integer(rStr);
+	std::cout << "LHS = " + left + ", RHS = " + right << std::endl;
+	cosc326::Integer lhs = cosc326::Integer(left);
+	cosc326::Integer rhs = cosc326::Integer(right);
 	std::cout << std::endl;
 
-	std::cout << lStr + " + " + rStr + " = ";
+	std::cout << left + " + " + right + " = ";
 	std::cout << (lhs + rhs).toString() << std::endl;
 	
-	std::cout << "-" + lStr + " + " + rStr + " = ";
+	std::cout << "-" + left + " + " + right + " = ";
 	std::cout << ((-lhs) + rhs).toString() << std::endl;
 
-	std::cout << lStr + " + (-" + rStr + ") = ";
+	std::cout << left + " + (-" + right + ") = ";
 	std::cout << (lhs + (-rhs)).toString() << std::endl;
 
-	std::cout << "-(" + lStr + ") + (-" + rStr + ") = ";
+	std::cout << "-(" + left + ") + (-" + right + ") = ";
 	std::cout << ((-lhs) + (-rhs)).toString() << std::endl;
 	
-	std::cout << lStr + " - " + rStr + " = ";
+	std::cout << left + " - " + right + " = ";
 	std::cout << (lhs - rhs).toString() << std::endl;
 	
-	std::cout << "-(" + lStr + ") - " + rStr + " = ";
+	std::cout << "-(" + left + ") - " + right + " = ";
 	std::cout << ((-lhs) - rhs).toString() << std::endl;
 		
-	std::cout << lStr + " - (-" + rStr + ") = ";
+	std::cout << left + " - (-" + right + ") = ";
 	std::cout << (lhs - (-rhs)).toString() << std::endl;
 		
-	std::cout << "-(" + lStr + ") - (-" + rStr + ") = ";
+	std::cout << "-(" + left + ") - (-" + right + ") = ";
 	std::cout << ((-lhs) - (-rhs)).toString() << std::endl;
 
-	std::cout << lStr + " * " + rStr + " = ";
+	std::cout << left + " * " + right + " = ";
 	std::cout << (lhs * rhs).toString() << std::endl;
 
 	return 0;

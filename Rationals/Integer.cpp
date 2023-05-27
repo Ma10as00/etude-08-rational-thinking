@@ -248,8 +248,7 @@ namespace cosc326 {
 	}
 
 	/** 
-	 * Traditional way of doing multiplication. This method is assuming that lhs has only 1 digit,
-	 * and that both factors are positive.
+	 * Traditional way of doing multiplication. This method is assuming that lhs has only 1 digit.
 	 */
 	Integer traditionalMult(const Integer& lhs, const Integer& rhs) {
 
@@ -296,6 +295,10 @@ namespace cosc326 {
 		int lDig = lhs.prop.nDigits;
 		int rDig = rhs.prop.nDigits;
 		
+		//Karatsuba's algorithm:
+		//----------------------
+
+		//Base case: if a factor has only one digit
 		if(lDig == 1){
 			return traditionalMult(lhs,rhs);
 		}
@@ -303,9 +306,7 @@ namespace cosc326 {
 			return traditionalMult(rhs,lhs);
 		}
 
-		//Karatsuba's algorithm:
-		//----------------------
-		// n = max number of digits of the two factors
+		// n = number of digits in the biggest factor
 		int n = (lDig > rDig)? lDig : rDig;
 		int half = n / 2;
 		int resDigits = lDig + rDig; //Result can have maximum (lDig + rDig) digits

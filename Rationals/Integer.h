@@ -13,7 +13,7 @@ namespace cosc326 {
 
 	public:
 
-
+		//Defining the type BigInt
 		typedef struct{
 			unsigned int nDigits;		//Number of digits - the size of the array (digits)
 			bool positive;				//true for positive numbers, false for negative
