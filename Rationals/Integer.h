@@ -23,12 +23,15 @@ namespace cosc326 {
 		BigInt prop;
 		/** The BigInt representation of 0. */
 		const BigInt BIGINT_ZERO = {1,true,{0}};
+		const BigInt MAX_INT = {9,true,{9,2,7,6,9,4,9,2,4}}; // corresponding to the int INT_MAX
 
 		Integer();                             // Integer i;
 		Integer(const Integer& i);             // Integer j(i);
 		Integer(const std::string& s);         // Integer k("123");
 
 		~Integer();
+
+		Integer MaxInteger() const;
 
 		Integer& operator=(const Integer& i);  // j = i;
 
@@ -43,7 +46,8 @@ namespace cosc326 {
 		Integer& operator/=(const Integer& i); // j /= i;
 		Integer& operator%=(const Integer& i); // j %= i;
 
-		std::string toString();
+		std::string toString() const;
+		int toInt() const;
 		
 		Integer traditionalMult(const Integer& lhs, const Integer& rhs);
 		
