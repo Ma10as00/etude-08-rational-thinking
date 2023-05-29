@@ -15,15 +15,14 @@ namespace cosc326 {
 
 		//Defining the type BigInt
 		typedef struct{
-			unsigned int nDigits;		//Number of digits - the size of the array (digits)
 			bool positive;				//true for positive numbers, false for negative
 			std::vector<int> digits;	//An array containing all the digits, in reverse order
 		} BigInt;
 
 		BigInt prop;
 		/** The BigInt representation of 0. */
-		const BigInt BIGINT_ZERO = {1,true,{0}};
-		const BigInt MAX_INT = {9,true,{9,2,7,6,9,4,9,2,4}}; // corresponding to the int INT_MAX
+		const BigInt BIGINT_ZERO = {true,{0}};
+		const BigInt MAX_INT = {true,{9,2,7,6,9,4,9,2,4}}; // corresponding to the int INT_MAX
 
 		Integer();                             // Integer i;
 		Integer(const Integer& i);             // Integer j(i);
@@ -48,8 +47,7 @@ namespace cosc326 {
 
 		std::string toString() const;
 		int toInt() const;
-		
-		Integer traditionalMult(const Integer& lhs, const Integer& rhs);
+		int nDigits() const;
 		
 		// lhs < rhs -- a 'friend' means operator isn't a member, but can access the private parts of the class.
 		// You may need to make some other functions friends, but do so sparingly.

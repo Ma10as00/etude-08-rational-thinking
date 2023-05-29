@@ -1,6 +1,9 @@
 #include "Integer.h"
 #include <sstream>
 #include <vector>
+#include <array>
+#include <cmath>
+#include <cstring>
 
 namespace cosc326 {
 
@@ -8,6 +11,7 @@ namespace cosc326 {
 		prop = BIGINT_ZERO;
 	}
 
+	/** Used throughout this file when referring to 0.*/
 	const Integer null;
 
 	Integer::Integer(const Integer& i) {		//integer j(i);
@@ -55,10 +59,10 @@ namespace cosc326 {
 						prop.digits[(length-1) - i] = digit;
 					}
 				}else{
-					//TODO - Handle invalid input
+					throw std::runtime_error("Invalid string for construction of an Integer.");
 				}
 			}
-			prop.nDigits = digCount; //Set number of digits
+			prop.digits.resize(digCount); 	//Remove unused space from digit-vector
 		}
 
 		if(digCount == 0){
@@ -78,7 +82,7 @@ namespace cosc326 {
 
 	std::string Integer::toString() const{
 		bool sign = (*this).prop.positive;
-		int nDig = (*this).prop.nDigits;
+		const int nDig = (*this).nDigits();
 		const std::vector<int> digs = (*this).prop.digits;
 		std::stringstream ss;
 
@@ -94,13 +98,22 @@ namespace cosc326 {
 		return ss.str();
 	}
 
+	int Integer::nDigits() const{
+		const int nDigits = (*this).prop.digits.size();
+		return nDigits;
+	}
+
 	int Integer::toInt() const{
-		bool sign = (*this).prop.positive;
-		int nDig = (*this).prop.nDigits;
+		if(*this > MaxInteger()){
+			throw std::range_error("Integer was to big to convert to int.");
+		}
+		const bool sign = (*this).prop.positive;
+		const int nDig = (*this).nDigits();
 		const std::vector<int> digs = (*this).prop.digits;
+
 		int result = 0;
 		for(int i = 0; i < nDig; i++){
-			result += digs[i] * 10^i;
+			result += digs[i] * std::pow(10,i);
 		}
 		return result;
 	}
@@ -110,8 +123,7 @@ namespace cosc326 {
 		return *this;
 	}
 
-	Integer Integer::operator-() const { 					// -j;
-		Integer null;
+	Integer Integer::operator-() const { 					// -j;S
 		Integer i = *this; 						// r = j
 		if(i == null){
 			return i;	//0 should always be positive
@@ -151,7 +163,6 @@ namespace cosc326 {
 
 	Integer operator+(const Integer& lhs, const Integer& rhs) {	// lhs + rhs;
 
-		Integer null;
 		if(lhs == null){ //If lhs is 0
 			return rhs;
 		}
@@ -163,8 +174,8 @@ namespace cosc326 {
 
 		if(lhs.prop.positive && rhs.prop.positive){ //If both numbers are positive
 			//Find the number of digits in lhs and rhs:
-			const int lDigits = lhs.prop.nDigits;
-			const int rDigits = rhs.prop.nDigits;
+			const int lDigits = lhs.nDigits();
+			const int rDigits = rhs.nDigits();
 
 			//Result can have at maximum one digit more than the biggest of lhs and rhs:
 			const int maxDigits = (lDigits > rDigits)? (lDigits + 1) : (rDigits + 1);
@@ -175,8 +186,6 @@ namespace cosc326 {
 
 			//Adding rhs onto lhs
 			for(int i = 0; i < maxDigits; i++){ //TODO try to make i an Integer instead of int
-				//Starter på enerplassen: TODO oversett
-
 				int l; //digit from lhs
 				if(i < lDigits){
 					l = lhs.prop.digits[i];
@@ -211,7 +220,6 @@ namespace cosc326 {
 			}
 
 			result.prop.digits.resize(digCount); //Remove redundant space from the vector
-			result.prop.nDigits = digCount;
 		}else if(!lhs.prop.positive && !rhs.prop.positive){ //Adding two negatives
 			// (-j) + (-i) = -(j + i)
 			result = (-lhs) + (-rhs); 			// result = j + i
@@ -227,7 +235,6 @@ namespace cosc326 {
 
 	Integer operator-(const Integer& lhs, const Integer& rhs) { // lhs - rhs;
 
-		Integer null;
 		if(lhs == null){ //If lhs is 0
 			return -rhs;
 		}
@@ -242,8 +249,8 @@ namespace cosc326 {
 				return result;	//return 0 (which is the default value of result)
 			}else if(lhs > rhs){
 				//Find the number of digits in lhs and rhs:
-				const int lDigits = lhs.prop.nDigits;
-				const int rDigits = rhs.prop.nDigits;
+				const int lDigits = lhs.nDigits();
+				const int rDigits = rhs.nDigits();
 
 				//Result can have at maximum as many digits as lhs:
 				result.prop.digits.resize(lDigits); //Making enough space for the resulting digits
@@ -284,7 +291,6 @@ namespace cosc326 {
 				}
 
 				result.prop.digits.resize(digCount); //Remove redundant space from the vector
-				result.prop.nDigits = digCount;
 			}else{ //If (lhs < rhs)
 				result = -(rhs - lhs);		// j - i = -(i - j)
 			}
@@ -302,14 +308,13 @@ namespace cosc326 {
 	/** 
 	 * Traditional way of doing multiplication. This method is assuming that lhs has only 1 digit.
 	 */
-	Integer Integer::traditionalMult(const Integer& lhs, const Integer& rhs) {
+	Integer traditionalMult(const Integer& lhs, const Integer& rhs) {
 
-		Integer null;
 		if(lhs == null || rhs == null){ //If lhs or rhs is 0
 			return null;
 		}
 
-		int rDig = rhs.prop.nDigits;	//number of digits in rhs
+		const int rDig = rhs.nDigits();	//number of digits in rhs
 		int l = lhs.prop.digits[0];		//The only digit in lhs
 
 		Integer result;
@@ -330,7 +335,7 @@ namespace cosc326 {
 				}
 			}
 		}
-		result.prop.nDigits = digCount;
+		result.prop.digits.resize(digCount); //Remove redundant space from the vector
 		if(lhs.prop.positive != rhs.prop.positive){
 			result.prop.positive = false;	//Result is negative if the factors have different signs (+/-)
 		}
@@ -339,13 +344,12 @@ namespace cosc326 {
 
 	Integer operator*(const Integer& lhs, const Integer& rhs) { // lhs * rhs;
 
-		Integer null;
 		if(lhs == null || rhs == null){ //If lhs or rhs is 0
 			return null;
 		}
 		
-		int lDig = lhs.prop.nDigits;
-		int rDig = rhs.prop.nDigits;
+		const int lDig = lhs.nDigits();
+		const int rDig = rhs.nDigits();
 		
 		//Karatsuba's algorithm:
 		//----------------------
@@ -360,9 +364,9 @@ namespace cosc326 {
 
 		// n = number of digits in the biggest factor
 		// m = number of digits in b and d
-		int n = max(lDig,rDig);
-		int smallest = min(lDig,rDig);
-		int m = min((n / 2), (smallest - 1)); //This ensures that a and c have at least one digit
+		int n = std::max(lDig,rDig);
+		int smallest = std::min(lDig,rDig);
+		int m = std::min((n / 2), (smallest - 1)); //This ensures that a and c have at least one digit
 		int maxDigits = lDig + rDig; //Result can have maximum (lDig + rDig) digits
 
 		//We are constructing a, b, c, d from strings, so that any leading zeroes will be removed
@@ -397,13 +401,13 @@ namespace cosc326 {
 				res += passingTens;		//Value passed from previous index
 				passingTens = 0;		//Reset passingTens
 			}
-			if (i < bd.prop.nDigits) {
+			if (i < bd.nDigits()) {
 				res += bd.prop.digits[i];
 			}
-			if (i >= m && (i - m) < ad_plus_bc.prop.nDigits) {
+			if (i >= m && (i - m) < ad_plus_bc.nDigits()) {
 				res += ad_plus_bc.prop.digits[i - m];
 			}
-			if (i >= 2 * m && (i - (2 * m)) < ac.prop.nDigits) {
+			if (i >= 2 * m && (i - (2 * m)) < ac.nDigits()) {
 				res += ac.prop.digits[i - 2 * m];
 			}
 			passingTens = res / 10;  		// Count how many 10s should be passed to next index
@@ -415,7 +419,7 @@ namespace cosc326 {
 				leadingZeroes = 0;	//Reset count of leadingZeroes if this digit is not 0
 			}
 		}
-		result.prop.nDigits = maxDigits - leadingZeroes;
+		result.prop.digits.resize(maxDigits - leadingZeroes); //Remove redundant space from the vector
 		//Result is negative if the factors have different signs (+/-):
 		if(lhs.prop.positive != rhs.prop.positive){
 			result.prop.positive = false;	
@@ -423,9 +427,10 @@ namespace cosc326 {
 		return result;
 	}
 
-		/** This method is quite fast for division when the divisor is big, but slow when rhs is a lot smaller than rhs.*/
+	/** This method is quite fast for division when the divisor is big, but slow when rhs is a lot smaller than rhs.
+	 * 	This method assumes that lhs and rhs are positive.
+	*/
 	Integer slowDivision(const Integer& lhs, const Integer& rhs) { // lhs / rhs;
-		const Integer null;
 		if(lhs < rhs){
 			return null;	//return 0 if (lhs < rhs)
 		}
@@ -433,11 +438,15 @@ namespace cosc326 {
 			throw std::runtime_error("Division by zero is not permitted.");
 		}
 		const Integer one = Integer("1");
+		if(rhs == one){		// j / 1 = j
+			return lhs;
+		}
 		Integer result = one;	//Since lhs >= rhs, result is at least 1.
-		result.prop.digits.resize(lhs.prop.nDigits); //result can have maximum as many digits as lhs
+		result.prop.digits.resize(lhs.nDigits()); //result can have maximum as many digits as lhs
 		Integer n = rhs;
 		Integer lastN;	
 		Integer lastRes;
+
 		//Square n until it gets too big
 		while(n <= lhs){
 			lastRes = result;
@@ -448,6 +457,7 @@ namespace cosc326 {
 		//Go back to the values we had before n went bigger than lhs:
 		n = lastN;
 		result = lastRes;
+
 		//Multiply n with rhs until it gets too big
 		while(n <= lhs){	//Runs loglhs(rhs) times, where loglhs is log with base lhs
 			lastN = n;
@@ -458,6 +468,8 @@ namespace cosc326 {
 		//Go back to the values we had before n went bigger than lhs:
 		n = lastN;
 		result = lastRes;
+
+		//Add rhs to n until it gets too big
 		while(n <= lhs){
 			lastRes = result;
 			n += rhs; 
@@ -468,42 +480,99 @@ namespace cosc326 {
 		return result;
 	}
 
-	Integer operator/(const Integer& lhs, const Integer& rhs) { // lhs / rhs;
-		if(lhs < rhs){
-			return null;	//return 0 if (lhs < rhs)
-		}
+	/** This functions encapsulates both operators '/' and '%'.
+	 * <p>
+	 * It returns an array with the quotient ('/') at index 0, and the rest('%') at index 1.
+	*/
+	std::array<Integer,2> fastDivision(const Integer& lhs, const Integer& rhs) { // lhs / rhs;
+		std::array<Integer,2> result;	//Holds quotient and rest
 		if(rhs == null){	//No division by 0
 			throw std::runtime_error("Division by zero is not permitted.");
 		}
-
-		Integer result;
-		Integer max = Integer();
-		int maxDigits = lhs.prop.nDigits;
-		result.prop.digits.resize(maxDigits);	//Make enough space to fill in resulting digits
-		Integer passingTens;
-
-		for(int i = 0; i < maxDigits; i++){
-			int index = maxDigits - 1 - i;	//iterate thorugh lhs's vector backwards (read number from the left)
-			int digit = lhs.prop.digits[index];
-			Integer tempDividend = Integer(std::to_string(digit));
-			tempDividend += passingTens * Integer("10");
-			passingTens = null;
-			Integer res = slowDivision(tempDividend,rhs);
-			Integer subtrahend = res*rhs;
-			passingTens = tempDividend - subtrahend;
-			result.prop.digits[i] = res;
+		if(lhs == rhs){		//return 1 if (lhs == rhs)
+			result[0] = Integer("1");	
+			result[1] = null;
+			return result;
 		}
+		if(!lhs.prop.positive && rhs.prop.positive){	//If lhs is negative
+			result = fastDivision((-lhs), rhs);
+			//negate both quotient and rest			
+			result[0] = -(result[0]);
+			result[1] = -(result[1]);
+			return result;
+		}
+		if(lhs.prop.positive && !rhs.prop.positive){	//If rhs is negative
+			result = fastDivision(lhs, (-rhs));
+			//negate quotient, rest stays positive			
+			result[0] = -(result[0]);
+			return result;
+		}
+		if(!lhs.prop.positive && !rhs.prop.positive){	//If both are negative
+			result = fastDivision((-lhs), (-rhs));
+			//Quotient stays positive, rest is negated
+			result[1] = -(result[1]);
+			return result;
+		}
+		if(lhs < rhs){
+			result[0] = null;	//(lhs < rhs) ==> lhs/rhs = 0
+			result[1] = lhs;	//The rest is the whole of lhs
+			return result;
+		}
+
+		Integer quotient;
+		const int lDigits = lhs.nDigits();
+		quotient.prop.digits.resize(lDigits);	//Quotient can have maximum as many digits as lhs
+		Integer passingTens;			//Passing excess value between indexes
+		Integer ten = Integer("10");	//This is used every time value is passed to next index
+		int digCount = 0;				//Counting digits in quotient
+		bool zeroesAreLeading = true; 	//false when the first nonzero digit in quotient is found
+
+		for(int i = 0; i < lDigits; i++){
+			int index = lDigits - 1 - i;	//iterate through lhs's vector backwards (read number from the left)
+			int l = lhs.prop.digits[index];
+
+			Integer tempDividend = Integer(std::to_string(l)); 	//The next number to divide by rhs.
+			tempDividend += passingTens * ten;				//Collect value passed from previous index
+			passingTens = null;								//Reset passing 10s
+			Integer res = slowDivision(tempDividend,rhs);	//Divide by rhs	
+			Integer subtrahend = res*rhs;					//Multiply back
+			passingTens = tempDividend - subtrahend;		//Pass excess value to next index
+			int resDigit = res.toInt();
+			if(resDigit > 9 || resDigit < 0){
+				throw std::runtime_error("This shouldn't happen. Something went wrong under division.");
+			}
+			if(!zeroesAreLeading || resDigit != 0){	//If resDigit is not a leading zero
+				quotient.prop.digits[index] = resDigit;		//Store resDigit in quotient
+				digCount++;									//Count digit
+				if(zeroesAreLeading){				//If resDigit was first nonzero digit
+					zeroesAreLeading = false;			//Zeroes are no longer leading zeroes
+				}
+			}
+		}
+		quotient.prop.digits.resize(digCount);	//Remove redundant space from vector
+		
+		result[0] = quotient;
+		result[1] = passingTens;	//The rest is the excess value after the last index 
+		return result;
+	} 
+
+	Integer operator/(const Integer& lhs, const Integer& rhs) { // lhs / rhs;
+		return fastDivision(lhs,rhs)[0];
 	} 
 
 	Integer operator%(const Integer& lhs, const Integer& rhs) { // lhs % rhs;
-		return lhs;
+		return fastDivision(lhs,rhs)[1];
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Integer& i) { // std::cout << i << std::endl;
+		os << i.toString();
 		return os;
 	}
 
 	std::istream& operator>>(std::istream& is, Integer& i) { 	// std::cin >> i;
+		std::string input;
+		is >> input;
+		i = Integer(input);
 		return is;
 	}
 	
@@ -522,8 +591,8 @@ namespace cosc326 {
 		
 		//If both are positive, check how many digits they have
 		else if(lPos && rPos){
-			int lDig = lhs.prop.nDigits;
-			int rDig = rhs.prop.nDigits;
+			const int lDig = lhs.nDigits();
+			const int rDig = rhs.nDigits();
 
 			if(lDig > rDig){
 				return false;
@@ -567,18 +636,32 @@ namespace cosc326 {
 	}
 
 	bool operator==(const Integer& lhs, const Integer& rhs) {	// lhs == rhs
-		return lhs.prop.digits == rhs.prop.digits &&
-			lhs.prop.nDigits == rhs.prop.nDigits &&
-			lhs.prop.positive == rhs.prop.positive;
+		return 	lhs.prop.digits == rhs.prop.digits &&
+				lhs.prop.positive == rhs.prop.positive;
 	}
 
 	bool operator!=(const Integer& lhs, const Integer& rhs) {	// lhs != rhs
 		return !(lhs == rhs);
 	}
 
-
 	Integer gcd(const Integer& a, const Integer& b) {			// i = gcd(a, b);		Greatest common divisor
-		return a;
+	//The Euclidian algorithm:
+		//Find max(a,b) and min(a,b):
+		Integer max; Integer min;
+		if(a > b){
+			max = a; min = b;
+		}else{
+			max = b; min = a;
+		}
+		Integer result;
+		//Find (max / min) and (max % min):
+		while(min != null){
+			result = min;
+			std::array<Integer,2> info = fastDivision(max, min);
+			max = min;
+			min = info[1];	//min = rest
+		}
+		return result;
 	}
 
 }

@@ -14,6 +14,11 @@ namespace cosc326 {
     
 	public:
 
+		Integer numerator;
+		Integer denominator;
+		Integer ones;
+		bool positive;
+
 		Rational();
         Rational(const std::string& str);
         Rational(const Rational& r);
@@ -34,6 +39,9 @@ namespace cosc326 {
 		Rational& operator-=(const Rational& r); // q -= r;
 		Rational& operator*=(const Rational& r); // q *= r;
 		Rational& operator/=(const Rational& r); // q /= r;
+		Rational& scaleBy(const Integer scalar); // (p / q) --> (s*p / s*q) 
+		Rational& scaleDown();					 // (s*p / s*q) --> (p / q)
+		Rational& extractOnes();				 // a.b/c --> (a + b / c).(b % c)/c
 												 
 		// lhs < rhs -- a 'friend' means < isn't a member, but can access the private parts of the class.
 		// You may need to make some other functions friends, but do so sparingly.
@@ -49,8 +57,8 @@ namespace cosc326 {
 	Rational operator*(const Rational& lhs, const Rational& rhs); // lhs * rhs;
 	Rational operator/(const Rational& lhs, const Rational& rhs); // lhs / rhs;
 	
-	std::ostream& operator<<(std::ostream& os, const Rational& i);  // std::cout << i << std::endl;
-	std::istream& operator>>(std::istream& is, Rational& i);        // std::cin >> i;
+	std::ostream& operator<<(std::ostream& os, const Rational& r);  // std::cout << i << std::endl;
+	std::istream& operator>>(std::istream& is, Rational& r);        // std::cin >> i;
 
 	bool operator> (const Rational& lhs, const Rational& rhs); // lhs > rhs
 	bool operator<=(const Rational& lhs, const Rational& rhs); // lhs <= rhs
