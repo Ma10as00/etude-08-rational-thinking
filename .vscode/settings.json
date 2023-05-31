@@ -44,7 +44,8 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "vector": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "array": "cpp"
     },
     "C_Cpp.errorSquiggles": "enabled",
     "cmake.sourceDirectory": "C:/COSC326/etude-08-rational-thinking/Rationals"

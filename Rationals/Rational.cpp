@@ -5,7 +5,7 @@ namespace cosc326 {
 
 	const Integer null;
 	const Integer one = Integer("1");
-	const Rational rNull;
+	const Rational rNull;	// null.null/one
 
 	Rational::Rational() {
 		this->numerator = null;
@@ -129,12 +129,15 @@ namespace cosc326 {
 		return *this;
 	}
 
+	/* Scales both the numerator and the dominator by the same scalar.
+	This does not change the value of the Rational. */
 	Rational& Rational::scaleBy(const Integer scalar){
 		this->numerator *= scalar;
 		this->denominator *= scalar;
 		return *this;
 	}
 
+	/* Scales the Rational, so the numerator and the denominator are as small as possible. */
 	Rational& Rational::scaleDown(){
 		const Integer divisor = gcd(this->numerator, this->denominator);
 		this->numerator /= divisor;
@@ -142,17 +145,46 @@ namespace cosc326 {
 		return *this;
 	}
 
+	/* If the fraction >= 1, this puts the 1 in front of the fraction and reduces the numerator. */
 	Rational& Rational::extractOnes(){
 		this->ones += (this->numerator / this->denominator);
 		this->numerator = (this->numerator % this->denominator);
 		return *this;
 	}
 
+	/* Puts all the ones into the fraction, so that ones = null, but the Rational hasn't changed value. */
+	Rational& Rational::fractionizeOnes(){
+		this->numerator += this->ones * this->denominator;
+		this->ones = null;
+		return *this;
+	}
+
+	/* Raises the rational to the power of -1. Useful for division. */
+	Rational& Rational::flip(){
+		this->fractionizeOnes();
+		//Numerator and denominator swap places:
+		Integer newNum = this->denominator;
+		this->denominator = this->numerator;
+		this->numerator = newNum;
+		//Simplify:
+		this->scaleDown();
+		this->extractOnes();
+		return *this;
+	}
+
+	/* Finds the lowest common multiplier, i.e. the lowest number that is divisible by both lhs and rhs. 
+	This is particularly useful when adding rationals together. 
+	*/
+	Integer lcm(const Integer& lhs, const Integer& rhs){
+		const Integer lcm = (lhs * rhs) / gcd(lhs, rhs);
+		return lcm;
+	}
+
 	Rational operator+(const Rational& lhs, const Rational& rhs) {
 
 		Integer ones = lhs.ones + rhs.ones;
-		//This formula gives lcm(lhs, rhs), the least common multiplier, which is our new denominator:
-		Integer denominator = (lhs.denominator * rhs.denominator) / gcd(lhs.denominator, rhs.denominator);
+		//The least common multiplier will be our new denominator:
+		Integer denominator = lcm(lhs.denominator, rhs.denominator);
 
 		//Scaling lhs:
 		Integer scalar = denominator / lhs.denominator;
@@ -175,11 +207,9 @@ namespace cosc326 {
 		return result;
 	}
 
-	Rational operator-(const Rational& lhs, const Rational& rhs) { //TODO This is just a copy of the operator+
-
-		Integer ones = lhs.ones + rhs.ones;
-		//This formula gives lcm(lhs, rhs), the least common multiplier, which is our new denominator:
-		Integer denominator = (lhs.denominator * rhs.denominator) / gcd(lhs.denominator, rhs.denominator);
+	Rational operator-(const Rational& lhs, const Rational& rhs) {
+		//The least common multiplier will be our new denominator:
+		Integer denominator = lcm(lhs.denominator, rhs.denominator);
 
 		//Scaling lhs:
 		Integer scalar = denominator / lhs.denominator;
@@ -191,23 +221,37 @@ namespace cosc326 {
 		Rational rhsScaled = rhs;
 		rhsScaled.scaleBy(scalar);
 		
-		Integer numerator = lhsScaled.numerator + rhsScaled.numerator;
+		//Put ones into fraction to make subtraction simpler
+		lhsScaled.fractionizeOnes();
+		rhsScaled.fractionizeOnes();
 
 		Rational result;
-		result.numerator = numerator;
+		result.numerator = lhsScaled.numerator - rhsScaled.numerator;
 		result.denominator = denominator;
-		result.ones = ones;
 		result.scaleDown();
 		result.extractOnes();
 		return result;
 	}
 
 	Rational operator*(const Rational& lhs, const Rational& rhs) {
-		return lhs;
+		Rational modifiableLHS = lhs;
+		Rational modifiableRHS = rhs;
+
+		modifiableLHS.fractionizeOnes();
+		modifiableRHS.fractionizeOnes();
+		
+		Rational result;
+		result.numerator = modifiableLHS.numerator * modifiableRHS.numerator;
+		result.denominator = modifiableLHS.denominator * modifiableRHS.denominator;
+		result.scaleDown();
+		result.extractOnes();
+		return result;
 	}
 
 	Rational operator/(const Rational& lhs, const Rational& rhs) {
-		return lhs;
+		Rational modifiableRHS = rhs;
+		modifiableRHS.flip();
+		return lhs * modifiableRHS;
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Rational& r) {
@@ -218,19 +262,19 @@ namespace cosc326 {
 		int onesSize = r.ones.nDigits();
 		for(int i = 0; i < onesSize; i++){
 			int index = onesSize - i - 1;	//Read vector backwards (read number from the left)
-			ss << r.ones.prop.digits[i];	//print digit
+			ss << r.ones.prop.digits[index];	//print digit
 		}
 		ss << '.';
 		int numSize = r.numerator.nDigits();
 		for(int i = 0; i < numSize; i++){
 			int index = numSize - i - 1;		//Read vector backwards (read number from the left)
-			ss << r.numerator.prop.digits[i];	//print digit
+			ss << r.numerator.prop.digits[index];	//print digit
 		}
 		ss << '/';
 		int denomSize = r.denominator.nDigits();
 		for(int i = 0; i < denomSize; i++){
 			int index = denomSize - i - 1;	//Read vector backwards (read number from the left)
-			ss << r.denominator.prop.digits[i];	//print digit
+			ss << r.denominator.prop.digits[index];	//print digit
 		}
 		os << ss.str();
 		return os;

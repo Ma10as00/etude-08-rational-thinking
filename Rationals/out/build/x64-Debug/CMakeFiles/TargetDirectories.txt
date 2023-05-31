@@ -1,3 +1,0 @@
-C:/COSC326/etude-08-rational-thinking/Rationals/out/build/x64-Debug/CMakeFiles/RationalThinking.dir
-C:/COSC326/etude-08-rational-thinking/Rationals/out/build/x64-Debug/CMakeFiles/edit_cache.dir
-C:/COSC326/etude-08-rational-thinking/Rationals/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir

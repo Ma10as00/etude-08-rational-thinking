@@ -42,8 +42,10 @@ namespace cosc326 {
 		Rational& scaleBy(const Integer scalar); // (p / q) --> (s*p / s*q) 
 		Rational& scaleDown();					 // (s*p / s*q) --> (p / q)
 		Rational& extractOnes();				 // a.b/c --> (a + b / c).(b % c)/c
+		Rational& fractionizeOnes();			 // a.b/c --> (a * c + b)/c
+		Rational& flip();						 // r --> r^(-1)
 												 
-		// lhs < rhs -- a 'friend' means < isn't a member, but can access the private parts of the class.
+		// lhs < rhs -- a s'friend' means < isn't a member, but can access the private parts of the class.
 		// You may need to make some other functions friends, but do so sparingly.
 		friend bool operator<(const Rational& lhs, const Rational& rhs);
 

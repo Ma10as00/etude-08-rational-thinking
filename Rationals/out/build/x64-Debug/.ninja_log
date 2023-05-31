@@ -1,9 +1,0 @@
-# ninja log v5
-3	382	7066080214843808	CMakeFiles/RationalThinking.dir/main.cpp.obj	df2f51515e152d61
-11	385	7066080214843808	CMakeFiles/RationalThinking.dir/Rational.cpp.obj	e1878107e3a6b34d
-7	459	7066080215623556	CMakeFiles/RationalThinking.dir/Integer.cpp.obj	66560bc3838546b7
-459	725	7066080218003668	RationalThinking.exe	fe8cc3d3ce06eaa7
-11	542	7066080510769253	CMakeFiles/RationalThinking.dir/main.cpp.obj	df2f51515e152d61
-543	673	7066080511719581	RationalThinking.exe	fe8cc3d3ce06eaa7
-11	313	7066080776457103	CMakeFiles/RationalThinking.dir/main.cpp.obj	df2f51515e152d61
-314	444	7066080777502265	RationalThinking.exe	fe8cc3d3ce06eaa7
