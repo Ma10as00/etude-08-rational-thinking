@@ -33,15 +33,38 @@ namespace cosc326 {
 		}
 
 		int dotPos = rStr.find('.');
+		bool hasDot = (dotPos != std::string::npos);
 		int slashPos = rStr.find('/');
+		bool hasSlash = (slashPos != std::string::npos);
 
-		std::string oneStr = rStr.substr(0, dotPos);
-		std::string numStr = rStr.substr(dotPos + 1, slashPos - dotPos - 1);
-		std::string denomStr = rStr.substr(slashPos + 1);
+		std::string oneStr;
+		std::string numStr;
+		std::string denomStr;
 
+		if(hasDot && hasSlash){
+			oneStr = rStr.substr(0, dotPos);
+			numStr = rStr.substr(dotPos + 1, slashPos - dotPos - 1);
+			denomStr = rStr.substr(slashPos + 1);
+		}
+		else if(!hasDot && hasSlash){
+			oneStr = "0";	//Ones is set to 0 by default.
+			numStr = rStr.substr(0,slashPos);
+			denomStr = rStr.substr(slashPos + 1);
+		}
+		else if(hasDot && !hasSlash){
+			oneStr = rStr.substr(0, dotPos);
+			numStr = rStr.substr(dotPos + 1);
+			denomStr = "1"; //Denominator is set to 1 by default.
+		}
+		else{
+			oneStr = rStr;	//The string is just an integer
+			numStr = "0";	//Numerator is 0 by default
+			denomStr = "1";	//Denominator is 1 by default
+		}
+
+		this->ones = Integer(oneStr);
 		this->numerator = Integer(numStr);
 		this->denominator = Integer(denomStr);
-		this->ones = Integer(oneStr);
 		this->scaleDown();
 		this->extractOnes();
 	}
@@ -97,7 +120,7 @@ namespace cosc326 {
 	}
 
 	Rational Rational::operator-() const {
-		Rational r;
+		Rational r = *this;
 		if(r == rNull){
 			return r;	//0 should always be positive
 		}
@@ -139,9 +162,13 @@ namespace cosc326 {
 
 	/* Scales the Rational, so the numerator and the denominator are as small as possible. */
 	Rational& Rational::scaleDown(){
-		const Integer divisor = gcd(this->numerator, this->denominator);
-		this->numerator /= divisor;
-		this->denominator /= divisor;
+		if(numerator == null){
+			this->denominator = one; // 0/x = 0/1
+		}else{
+			const Integer divisor = gcd(this->numerator, this->denominator);
+			this->numerator /= divisor;
+			this->denominator /= divisor;
+		}
 		return *this;
 	}
 
@@ -180,60 +207,109 @@ namespace cosc326 {
 		return lcm;
 	}
 
+	void scaleToCommonDenominator(Rational& lhs, Rational& rhs){
+		Integer denom = lcm(lhs.denominator, rhs.denominator);
+		//Scale LHS:
+		Integer scalar = denom / lhs.denominator;
+		lhs.scaleBy(scalar);
+		//Scale RHS:
+		scalar = denom / rhs.denominator;
+		rhs.scaleBy(scalar);
+	};
+
 	Rational operator+(const Rational& lhs, const Rational& rhs) {
 
-		Integer ones = lhs.ones + rhs.ones;
-		//The least common multiplier will be our new denominator:
-		Integer denominator = lcm(lhs.denominator, rhs.denominator);
-
-		//Scaling lhs:
-		Integer scalar = denominator / lhs.denominator;
-		Rational lhsScaled = lhs;
-		lhsScaled.scaleBy(scalar);
-
-		//Scaling rhs:
-		scalar = denominator / rhs.denominator;
-		Rational rhsScaled = rhs;
-		rhsScaled.scaleBy(scalar);
-		
-		Integer numerator = lhsScaled.numerator + rhsScaled.numerator;
+		if(lhs == rNull){ //If lhs is 0
+			return rhs;
+		}
+		if(rhs == rNull){ //If rhs is 0
+			return lhs;
+		}
 
 		Rational result;
-		result.numerator = numerator;
-		result.denominator = denominator;
-		result.ones = ones;
-		result.scaleDown();
-		result.extractOnes();
+		//If both LHS and RHS are positive:
+		if(lhs.positive && rhs.positive){
+			Integer ones = lhs.ones + rhs.ones;
+
+			Rational lhsScaled = lhs;
+			Rational rhsScaled = rhs;
+			scaleToCommonDenominator(lhsScaled, rhsScaled);
+			
+			Integer numerator = lhsScaled.numerator + rhsScaled.numerator;
+			Integer denominator = lhsScaled.denominator; // = rhsScaled.denominator
+
+			result.numerator = numerator;
+			result.denominator = denominator;
+			result.ones = ones;
+			result.scaleDown();
+			result.extractOnes();
+		}
+		else if(!lhs.positive && !rhs.positive){ //Adding two negatives
+			// (-j) + (-i) = -(j + i)
+			result = (-lhs) + (-rhs); 	// result = j + i
+			result.positive = false;	// result = -(j + i)
+		}
+		else if(lhs.positive && !rhs.positive){
+			result = lhs - (-rhs);				// j + (-i) = j - i
+		}
+		else if(!lhs.positive && rhs.positive){
+			result = rhs - (-lhs);				// (-j) + i = i - j
+		}
+
 		return result;
 	}
 
 	Rational operator-(const Rational& lhs, const Rational& rhs) {
-		//The least common multiplier will be our new denominator:
-		Integer denominator = lcm(lhs.denominator, rhs.denominator);
 
-		//Scaling lhs:
-		Integer scalar = denominator / lhs.denominator;
-		Rational lhsScaled = lhs;
-		lhsScaled.scaleBy(scalar);
-
-		//Scaling rhs:
-		scalar = denominator / rhs.denominator;
-		Rational rhsScaled = rhs;
-		rhsScaled.scaleBy(scalar);
-		
-		//Put ones into fraction to make subtraction simpler
-		lhsScaled.fractionizeOnes();
-		rhsScaled.fractionizeOnes();
+		if(lhs == rNull){ //If lhs is 0
+std::cout << std::endl << "lhs was 0" << std::endl;
+			return -rhs;
+		}
+		if(rhs == rNull){ //If rhs is 0
+std::cout << std::endl << "rhs was 0" << std::endl;
+			return lhs;
+		}
 
 		Rational result;
-		result.numerator = lhsScaled.numerator - rhsScaled.numerator;
-		result.denominator = denominator;
-		result.scaleDown();
-		result.extractOnes();
+		
+		if(lhs.positive && rhs.positive){
+			if(lhs == rhs){
+				result = rNull;
+			}
+			else if (lhs < rhs){
+				result = -(rhs - lhs);
+			}
+			else{
+				Rational modifiableLHS = lhs;
+				Rational modifiableRHS = rhs;
+
+				modifiableLHS.fractionizeOnes();
+				modifiableRHS.fractionizeOnes();
+				scaleToCommonDenominator(modifiableLHS, modifiableRHS);
+
+				result.numerator = modifiableLHS.numerator - modifiableRHS.numerator;
+				result.denominator = modifiableLHS.denominator; // = modifiableRHS.denominator
+				result.scaleDown();
+				result.extractOnes();
+			}
+		}
+		else if(!lhs.positive && !rhs.positive){ 
+			result = (-rhs) - (-lhs);		// (-j) - (-i) = i - j
+		}
+		else if(lhs.positive && !rhs.positive){
+			result = lhs + (-rhs);			// j - (-i) = j + i
+		}
+		else if(!lhs.positive && rhs.positive){
+			result = -((-lhs) + rhs);			// (-j) - i = -(j + i)
+		}
 		return result;
 	}
 
 	Rational operator*(const Rational& lhs, const Rational& rhs) {
+
+		if(lhs == rNull || rhs == rNull){ //If lhs or rhs is 0
+			return rNull;
+		}
 		Rational modifiableLHS = lhs;
 		Rational modifiableRHS = rhs;
 
@@ -241,6 +317,10 @@ namespace cosc326 {
 		modifiableRHS.fractionizeOnes();
 		
 		Rational result;
+		//Result is negative if LHS and RHS have different signs (+/.)
+		if(lhs.positive != rhs.positive){ 
+			result.positive = false;	
+		}
 		result.numerator = modifiableLHS.numerator * modifiableRHS.numerator;
 		result.denominator = modifiableLHS.denominator * modifiableRHS.denominator;
 		result.scaleDown();
@@ -259,23 +339,30 @@ namespace cosc326 {
 		if(!r.positive){
 			ss << '-';	//Add sign if r is negative
 		}
-		int onesSize = r.ones.nDigits();
-		for(int i = 0; i < onesSize; i++){
-			int index = onesSize - i - 1;	//Read vector backwards (read number from the left)
-			ss << r.ones.prop.digits[index];	//print digit
+		if(r.ones != null){ //Unless ones is 0, add ones to string
+			int onesSize = r.ones.nDigits();
+			for(int i = 0; i < onesSize; i++){
+				int index = onesSize - i - 1;	//Read vector backwards (read number from the left)
+				ss << r.ones.prop.digits[index];	//print digit
+			}
+			if(r.numerator != null){
+				ss << '.';	//Add dot if a fraction follows
+			}
 		}
-		ss << '.';
-		int numSize = r.numerator.nDigits();
-		for(int i = 0; i < numSize; i++){
-			int index = numSize - i - 1;		//Read vector backwards (read number from the left)
-			ss << r.numerator.prop.digits[index];	//print digit
+		if(r.numerator != null){ //Unless numerator is 0, add fraction to string
+			int numSize = r.numerator.nDigits();
+			for(int i = 0; i < numSize; i++){
+				int index = numSize - i - 1;		//Read vector backwards (read number from the left)
+				ss << r.numerator.prop.digits[index];	//print digit
+			}
+			ss << '/';
+			int denomSize = r.denominator.nDigits();
+			for(int i = 0; i < denomSize; i++){
+				int index = denomSize - i - 1;	//Read vector backwards (read number from the left)
+				ss << r.denominator.prop.digits[index];	//print digit
+			}
 		}
-		ss << '/';
-		int denomSize = r.denominator.nDigits();
-		for(int i = 0; i < denomSize; i++){
-			int index = denomSize - i - 1;	//Read vector backwards (read number from the left)
-			ss << r.denominator.prop.digits[index];	//print digit
-		}
+		
 		os << ss.str();
 		return os;
 	}
@@ -288,27 +375,40 @@ namespace cosc326 {
 	}
 
 	bool operator<(const Rational& lhs, const Rational& rhs) {
-		return true;
+		Rational modifiableLHS = lhs;
+		Rational modifiableRHS = rhs;
+
+		modifiableLHS.fractionizeOnes();
+		modifiableRHS.fractionizeOnes();
+		scaleToCommonDenominator(modifiableLHS, modifiableRHS);
+
+		return modifiableLHS.numerator < modifiableRHS.numerator;
 	}
 
 	bool operator> (const Rational& lhs, const Rational& rhs) {
-		return true;
+		return !(lhs < rhs || lhs == rhs);
 	}
 
 	bool operator<=(const Rational& lhs, const Rational& rhs) {
-		return true;
+		return (lhs < rhs || lhs == rhs);
 	}
 
 	bool operator>=(const Rational& lhs, const Rational& rhs) {
-		return true;
+		return !(lhs < rhs) || (lhs == rhs);
 	}
 
 	bool operator==(const Rational& lhs, const Rational& rhs) {
-		return true;
+		Rational modifiableLHS = lhs;
+		Rational modifiableRHS = rhs;
+		modifiableLHS.fractionizeOnes();
+		modifiableRHS.fractionizeOnes();
+		scaleToCommonDenominator(modifiableLHS, modifiableRHS);
+
+		return modifiableLHS.numerator == modifiableRHS.numerator;
 	}
 
 	bool operator!=(const Rational& lhs, const Rational& rhs) {
-		return true;
+		return !(lhs == rhs);
 	}
 
 }

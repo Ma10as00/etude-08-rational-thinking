@@ -442,7 +442,6 @@ namespace cosc326 {
 			return lhs;
 		}
 		Integer result = one;	//Since lhs >= rhs, result is at least 1.
-		result.prop.digits.resize(lhs.nDigits()); //result can have maximum as many digits as lhs
 		Integer n = rhs;
 		Integer lastN;	
 		Integer lastRes;
@@ -537,7 +536,7 @@ namespace cosc326 {
 			Integer res = slowDivision(tempDividend,rhs);	//Divide by rhs	
 			Integer subtrahend = res*rhs;					//Multiply back
 			passingTens = tempDividend - subtrahend;		//Pass excess value to next index
-			int resDigit = res.toInt();
+			int resDigit = res.toInt();						//We can do this because we know that res <= 9.
 			if(resDigit > 9 || resDigit < 0){
 				throw std::runtime_error("This shouldn't happen. Something went wrong under division.");
 			}

@@ -28,10 +28,11 @@ int main() {
 			std::cerr << e.what() << '\n';
 		}
 		std::cout << std::endl << "Addition:" << std::endl;
+
 		std::cout << lhs << " + " << rhs << " = ";
 		std::cout << (lhs + rhs) << std::endl;
 		
-		std::cout << "-" << lhs << " + " << rhs << " = ";
+		std::cout << "-(" << lhs << ") + " << rhs << " = ";
 		std::cout << ((-lhs) + rhs) << std::endl;
 
 		std::cout << lhs << " + (-" << rhs << ") = ";
@@ -134,20 +135,81 @@ int main() {
 		std::cout << rr << std::endl; 
 
 		std::cout << std::endl << "Addition:" << std::endl;
+
 		std::cout << lr << " + " << rr << " = ";
 		std::cout << (lr + rr) << std::endl;
+		
+		std::cout << "-(" << lr << ") + " << rr << " = ";
+		std::cout << ((-lr) + rr) << std::endl;
 
-		std::cout << std::endl << "Subraction:" << std::endl;
+		std::cout << lr << " + (-" << rr << ") = ";
+		std::cout << (lr + (-rr)) << std::endl;
+
+		std::cout << "-(" << lr << ") + (-" << rr << ") = ";
+		std::cout << ((-lr) + (-rr)) << std::endl;
+		
+		std::cout << std::endl << "Subtraction:" << std::endl;
+
 		std::cout << lr << " - " << rr << " = ";
 		std::cout << (lr - rr) << std::endl;
+		
+		std::cout << "-(" << lr << ") - " << rr << " = ";
+		std::cout << ((-lr) - rr) << std::endl;
+			
+		std::cout << lr << " - (-" << rr << ") = ";
+		std::cout << (lr - (-rr)) << std::endl;
+			
+		std::cout << "-(" << lr << ") - (-" << rr << ") = ";
+		std::cout << ((-lr) - (-rr)) << std::endl;
 
 		std::cout << std::endl << "Multiplication:" << std::endl;
+
 		std::cout << lr << " * " << rr << " = ";
 		std::cout << (lr * rr) << std::endl;
 
+		std::cout << "-(" << lr << ") * " << rr << " = ";
+		std::cout << ((-lr) * rr) << std::endl;
+
+		std::cout << lr << " * (-" << rr << ") = ";
+		std::cout << (lr * (-rr)) << std::endl;
+
+		std::cout << "-(" << lr << ") * (-" << rr << ") = ";
+		std::cout << ((-lr) * (-rr)) << std::endl;
+
+		
 		std::cout << std::endl << "Division:" << std::endl;
+		
 		std::cout << lr << " / " << rr << " = ";
 		std::cout << (lr / rr) << std::endl;
+
+		std::cout << "-(" << lr << ") / " << rr << " = ";
+		std::cout << ((-lr) / rr) << std::endl;
+
+		std::cout << lr << " / (-" << rr << ") = ";
+		std::cout << (lr / (-rr)) << std::endl;
+
+		std::cout << "-(" << lr << ") / (-" << rr << ") = ";
+		std::cout << ((-lr) / (-rr)) << std::endl;
+
+		std::cout << std::endl << "Boolean operators:" << std::endl;
+
+		std::cout << lr << " < " << rr << ": ";
+		std::cout << (lr < rr) << std::endl;
+
+		std::cout << lr << " > " << rr << ": ";
+		std::cout << (lr > rr) << std::endl;
+
+		std::cout << lr << " <= " << rr << ": ";
+		std::cout << (lr <= rr) << std::endl;
+
+		std::cout << lr << " >= " << rr << ": ";
+		std::cout << (lr >= rr) << std::endl;
+
+		std::cout << lr << " == " << rr << ": ";
+		std::cout << (lr == rr) << std::endl;
+
+		std::cout << lr << " != " << rr << ": ";
+		std::cout << (lr != rr) << std::endl;
 
 		std::cout << std::endl << "Do you wanna try again? (Type '1' for yes, and '0' for no.)" << std::endl;
 		Integer answer;
