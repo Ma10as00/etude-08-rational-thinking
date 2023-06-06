@@ -15,6 +15,7 @@ For division, we made our own algorithm to perform the "smaller divisions", call
 ## Rational
 
 The Rationals holds three Integers: The numerator, the denominator, and one for the "whole ones".
+
 It also holds a boolean of its own, indicating whether it is positive or not.
 
 The aritmetics in this class also correspond with primary school mathematics, and lean heavily on the already implemented operations of Integers.
