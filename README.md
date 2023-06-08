@@ -22,3 +22,7 @@ The arithmetics in this class also correspond with primary school mathematics, a
 
 We added some helping methods for scaling fractions, and moving the "whole ones" into/out of the fraction, 
 since these are operations that is performed in almost every arithmetic operation with rationals.
+
+## Running program
+
+To run the main file, testing all the operators on Integers and Rationals that you give as input, write ".\main" in the terminal, while being in the right directory (...\etude-08-rational-thinking\Rationals).
