@@ -130,7 +130,7 @@ int main() {
 		std::cin >> lr;
 		std::cout << lr << std::endl; 
 		Rational rr;
-		std::cout << "Pick a number for LHS: ";
+		std::cout << "Pick a number for RHS: ";
 		std::cin >> rr;
 		std::cout << rr << std::endl; 
 
